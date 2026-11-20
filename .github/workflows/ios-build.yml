@@ -1,0 +1,58 @@
+name: iOS Build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: ios-build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  BAZEL_DISK_CACHE: ${{ runner.temp }}/telegram-bazel-cache
+  BAZEL_REPO_CACHE: ${{ runner.temp }}/bazel-repository-cache
+
+jobs:
+  build:
+    name: Build (debug_sim_arm64)
+    runs-on: macos-15
+    timeout-minutes: 300
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Cache Bazel artifacts and downloaded libraries
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.BAZEL_DISK_CACHE }}
+            ${{ env.BAZEL_REPO_CACHE }}
+          key: bazel-${{ runner.os }}-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock', '**/Package.swift', '**/Package.resolved', 'build-system/**/*.bzl') }}
+          restore-keys: |
+            bazel-${{ runner.os }}-
+
+      - name: Configure Bazel repository cache
+        run: |
+          mkdir -p "$BAZEL_REPO_CACHE"
+          printf '\nbuild --repository_cache=%s\n' "$BAZEL_REPO_CACHE" >> .bazelrc
+
+      - name: Build
+        run: |
+          python3 build-system/Make/Make.py \
+            --overrideXcodeVersion \
+            --cacheDir "$BAZEL_DISK_CACHE" \
+            build \
+            --configurationPath build-system/ci-configuration.json \
+            --xcodeManagedCodesigning \
+            --buildNumber=1 \
+            --configuration=debug_sim_arm64
