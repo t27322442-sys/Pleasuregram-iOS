@@ -15,8 +15,8 @@ permissions:
   contents: read
 
 env:
-  BAZEL_DISK_CACHE: ${{ runner.temp }}/telegram-bazel-cache
-  BAZEL_REPO_CACHE: ${{ runner.temp }}/bazel-repository-cache
+  BAZEL_DISK_CACHE: ${{ github.workspace }}/.bazel-disk-cache
+  BAZEL_REPO_CACHE: ${{ github.workspace }}/.bazel-repository-cache
 
 jobs:
   build:
