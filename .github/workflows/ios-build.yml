@@ -51,6 +51,6 @@ jobs:
             --cacheDir "$RUNNER_TEMP/telegram-bazel-cache" \
             build \
             --configurationPath build-system/ci-configuration.json \
-            --xcodeManagedCodesigning \
+            --codesigningInformationPath=build-system/fake-codesigning \
             --buildNumber=1 \
             --configuration=debug_sim_arm64
