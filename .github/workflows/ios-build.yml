@@ -21,7 +21,7 @@ env:
 jobs:
   build:
     name: Build (debug_sim_arm64)
-    runs-on: macos-15
+    runs-on: xcode-27
     timeout-minutes: 300
 
     steps:
