@@ -62,16 +62,19 @@ jobs:
             --buildNumber=1 \
             --configuration="$BUILD_CONFIGURATION"
 
+      - name: Rename IPA
+        run: cp bazel-bin/Telegram/Telegram.ipa Pleasuregram.ipa
+
       - name: Publish IPA to GitHub Releases
         if: github.event_name != 'pull_request'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: release-sim-${{ github.run_number }}
-          name: Telegram iOS ${{ steps.version.outputs.app_version }} release (build ${{ github.run_number }})
+          name: Pleasuregram iOS ${{ steps.version.outputs.app_version }} release (build ${{ github.run_number }})
           prerelease: true
           body: |
             Automated `release_sim_arm64` build (simulator, fake codesigning).
 
             - Commit: `${{ github.sha }}`
             - Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          files: bazel-bin/Telegram/Telegram.ipa
+          files: Pleasuregram.ipa
