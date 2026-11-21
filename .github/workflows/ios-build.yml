@@ -14,9 +14,12 @@ concurrency:
 permissions:
   contents: write
 
+env:
+  BUILD_CONFIGURATION: release_sim_arm64
+
 jobs:
   build:
-    name: Build (debug_sim_arm64)
+    name: Build (release_sim_arm64)
     runs-on: xcode-27
     timeout-minutes: 300
 
@@ -33,9 +36,9 @@ jobs:
           path: |
             ${{ runner.temp }}/telegram-bazel-cache
             ${{ runner.temp }}/bazel-repository-cache
-          key: bazel-${{ runner.os }}-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock', '**/Package.swift', '**/Package.resolved', 'build-system/**/*.bzl') }}
+          key: bazel-${{ runner.os }}-${{ env.BUILD_CONFIGURATION }}-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock', '**/Package.swift', '**/Package.resolved', 'build-system/**/*.bzl') }}
           restore-keys: |
-            bazel-${{ runner.os }}-
+            bazel-${{ runner.os }}-${{ env.BUILD_CONFIGURATION }}-
 
       - name: Configure Bazel caches
         run: |
@@ -57,17 +60,17 @@ jobs:
             --configurationPath build-system/ci-configuration.json \
             --codesigningInformationPath=build-system/fake-codesigning \
             --buildNumber=1 \
-            --configuration=debug_sim_arm64
+            --configuration="$BUILD_CONFIGURATION"
 
       - name: Publish IPA to GitHub Releases
         if: github.event_name != 'pull_request'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: build-${{ github.run_number }}
-          name: Telegram iOS ${{ steps.version.outputs.app_version }} (build ${{ github.run_number }})
+          tag_name: release-sim-${{ github.run_number }}
+          name: Telegram iOS ${{ steps.version.outputs.app_version }} release (build ${{ github.run_number }})
           prerelease: true
           body: |
-            Automated `debug_sim_arm64` build (simulator, fake codesigning).
+            Automated `release_sim_arm64` build (simulator, fake codesigning).
 
             - Commit: `${{ github.sha }}`
             - Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
