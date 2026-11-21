@@ -81,10 +81,10 @@ jobs:
           name: Pleasuregram iOS ${{ steps.version.outputs.app_version }} device build (build ${{ github.run_number }})
           prerelease: true
           body: |
-            Device (arm64) build of Pleasuregram, signed with the repository's fake certificate.
+            Device (arm64) build of Pleasuregram, ad-hoc signed (not a simulator build).
 
-            Re-sign it with your own Apple ID (AltStore / Sideloadly) before installing, or replace the
-            certificate and profiles with real App Store/ad-hoc ones for TestFlight distribution.
+            Re-sign it with your own Apple ID (AltStore / Sideloadly) before installing, or rebuild with
+            real App Store credentials for TestFlight distribution.
 
             - Commit: `${{ github.sha }}`
             - Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

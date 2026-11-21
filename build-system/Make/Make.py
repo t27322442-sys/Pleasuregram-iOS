@@ -191,9 +191,10 @@ class BazelCommandLine:
 
                 '--watchos_cpus=arm64_32',
 
-                # Device codesigning with a real identity is memory-hungry. The macOS runner
-                # OOM-kills parallel codesign invocations, so cap Bazel's parallelism.
-                '--jobs=2',
+                # Sign ad hoc instead of using the self-signed "Apple Distribution" identity.
+                # With a real identity codesign hangs for ~14 min and gets SIGKILLed on the
+                # macOS runner. A profile is still required by rules_apple for device builds.
+                '--@build_bazel_rules_apple//apple/build_settings:signing_certificate_name=-',
             ] + self.common_debug_args
         elif configuration == 'release_arm64':
             self.configuration_args = [
