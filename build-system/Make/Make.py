@@ -1057,6 +1057,7 @@ if __name__ == '__main__':
             'debug_arm64',
             'debug_sim_arm64',
             'release_sim_arm64',
+            'release_device_arm64',
             'release_arm64',
         ],
         required=True,
