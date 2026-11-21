@@ -189,7 +189,12 @@ class BazelCommandLine:
                 # Build a device (arm64) binary rather than a simulator one.
                 '--ios_multi_cpus=arm64',
 
-                '--watchos_cpus=arm64_32'
+                '--watchos_cpus=arm64_32',
+
+                # Device codesigning with a real identity is memory-hungry. The macOS runner
+                # OOM-kills parallel codesign invocations, so cap Bazel's parallelism.
+                '--jobs=2',
+                '--local_ram_resources=4096',
             ] + self.common_debug_args
         elif configuration == 'release_arm64':
             self.configuration_args = [

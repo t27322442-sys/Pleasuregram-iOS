@@ -89,3 +89,12 @@ jobs:
             - Commit: `${{ github.sha }}`
             - Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           files: Pleasuregram-device.ipa
+
+      - name: Save Bazel cache on failure
+        if: failure()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ${{ runner.temp }}/telegram-bazel-cache
+            ${{ runner.temp }}/bazel-repository-cache
+          key: bazel-${{ runner.os }}-${{ env.BUILD_CONFIGURATION }}-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock', '**/Package.swift', '**/Package.resolved', 'build-system/**/*.bzl') }}-partial
