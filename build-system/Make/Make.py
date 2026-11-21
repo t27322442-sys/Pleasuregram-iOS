@@ -180,6 +180,17 @@ class BazelCommandLine:
                 # Always build universal Watch binaries.
                 '--watchos_cpus=arm64_32'
             ] + self.common_debug_args
+        elif configuration == 'release_device_arm64':
+            self.configuration_args = [
+                # Optimized device build without Swift WMO / Rust LTO so it stays close to
+                # the simulator release build in time and IPA size.
+                '-c', 'opt',
+
+                # Build a device (arm64) binary rather than a simulator one.
+                '--ios_multi_cpus=arm64',
+
+                '--watchos_cpus=arm64_32'
+            ] + self.common_debug_args
         elif configuration == 'release_arm64':
             self.configuration_args = [
                 # bazel optimized build configuration
