@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -44,6 +44,10 @@ jobs:
             "$RUNNER_TEMP/bazel-repository-cache" \
             "$RUNNER_TEMP/bazel-repository-cache/contents" >> .bazelrc
 
+      - name: Read app version
+        id: version
+        run: echo "app_version=$(python3 -c 'import json;print(json.load(open("versions.json"))["app"])')" >> "$GITHUB_OUTPUT"
+
       - name: Build
         run: |
           python3 build-system/Make/Make.py \
@@ -54,3 +58,17 @@ jobs:
             --codesigningInformationPath=build-system/fake-codesigning \
             --buildNumber=1 \
             --configuration=debug_sim_arm64
+
+      - name: Publish IPA to GitHub Releases
+        if: github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Telegram iOS ${{ steps.version.outputs.app_version }} (build ${{ github.run_number }})
+          prerelease: true
+          body: |
+            Automated `debug_sim_arm64` build (simulator, fake codesigning).
+
+            - Commit: `${{ github.sha }}`
+            - Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          files: bazel-bin/Telegram/Telegram.ipa
